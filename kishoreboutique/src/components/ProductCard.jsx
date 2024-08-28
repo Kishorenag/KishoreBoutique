@@ -8,8 +8,8 @@ export default function ProductCard(props) {
   let { id, imageUrl, category, productName, rating, price } = props;
   const navigate = useNavigate();
 
-  const navigateTo = (productId) => {
-    navigate(`/products/${productId}`);
+  const navigateTo = (id) => {
+    navigate(`/products/${id}`);
   };
 
   const [cartData, setCartData] = useState(getCartFromLocal());
@@ -27,26 +27,45 @@ export default function ProductCard(props) {
   const quantity = cartData?.filter((item) => item.id === id)[0]?.quantity || 0;
 
   function addToCart() {
-    const newCartItemData = {
-      id: id,
-      image: imageUrl,
-      productName: productName,
-      price: price,
-      quantity: 1,
-    };
-    const newCartData = [...cartData, newCartItemData];
-    saveCartToLocal(newCartData)
+    let existingItem = cartData.find((item) => item.id === id);
+
+    let newCartData;
+
+    if (existingItem) {
+      newCartData = cartData.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    } else {
+      const newCartItemData = {
+        id: id,
+        image: imageUrl,
+        productName: productName,
+        price: price,
+        quantity: 1,
+      };
+      newCartData = [...cartData, newCartItemData];
+    }
+    saveCartToLocal(newCartData);
+    window.dispatchEvent(new Event("cartUpdated"));
   }
 
   return (
-    <Card style={{ width: "18rem" }}>
+    <Card
+      style={{
+        width: "18rem",
+        border: "none",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      }}
+    >
       <Card.Img
         variant="top"
         src={imageUrl}
         style={{
           height: 300,
           objectFit: "contain",
+          cursor: "pointer",
         }}
+        onClick={() => navigateTo(id)}
       />
       <Card.Body>
         <Stack
@@ -58,12 +77,17 @@ export default function ProductCard(props) {
         >
           <div>
             <Card.Text>{toTitleCase(category)}</Card.Text>
-            <Card.Title>{productName}</Card.Title>
+            <Card.Title
+              onClick={() => navigateTo(id)}
+              style={{ cursor: "pointer" }}
+            >
+              {productName}
+            </Card.Title>
           </div>
           <div>
             <Card.Text>{rating}</Card.Text>
-            <Card.Text>₹ {price}</Card.Text>
-            {quantity <= 0 || quantity === undefined ? (
+            <Card.Text>₹ {Math.round(price)}</Card.Text>
+            {quantity <= 0 ? (
               <Button variant="primary" onClick={addToCart}>
                 Add to Cart
               </Button>

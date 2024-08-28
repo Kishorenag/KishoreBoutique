@@ -79,7 +79,7 @@ export async function saveCartToLocal(cartData) {
 
   localStorage.setItem("myCartData", JSON.stringify(tempCartData));
   window.dispatchEvent(new Event("cartUpdated"));
-  
+
   return tempCartData;
 }
 
@@ -110,23 +110,35 @@ async function getProductById(id) {
 
 export function addCartItem(cartItemId) {
   const cartData = getCartFromLocal();
-  const newCardData = cartData?.map(item =>
-    item.id === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
-  );
-  localStorage.setItem("myCartData", JSON.stringify(newCardData));
+  const itemIndex = cartData?.findIndex((item) => item.id === cartItemId);
+
+  if (itemIndex >= 0){
+    cartData[itemIndex].quantity += 1
+  }else{
+    const newItem = {
+      id: cartItemId,
+      quantity: 1
+    }
+    cartData.push(newItem)
+  }
+  saveCartToLocal(cartData);
   window.dispatchEvent(new Event("cartUpdated"));
 }
 
 export function removeCartItem(cartItemId) {
   const cartData = getCartFromLocal();
-  const newCardData = cartData?.map(item =>
-    item.id === cartItemId ? { ...item, quantity: item.quantity - 1 } : item
-  );
-  localStorage.setItem("myCartData", JSON.stringify(newCardData));
+  const itemIndex = cartData.findIndex((item) => item.id === cartItemId);
+  if (itemIndex >= 0) {
+    cartData[itemIndex].quantity -= 1;
+    if (cartData[itemIndex].quantity <= 0) {
+      cartData.splice(itemIndex, 1);
+    }
+  }
+  saveCartToLocal(cartData);
   window.dispatchEvent(new Event("cartUpdated"));
 }
 
-export  function removeFromCart(cartItemId, quantity) {
+export function removeFromCart(cartItemId, quantity) {
   const cartData = getCartFromLocal();
   const newCartData = cartData.filter((item) => item.id !== cartItemId);
   saveCartToLocal(newCartData);
@@ -135,4 +147,3 @@ export  function removeFromCart(cartItemId, quantity) {
   console.table(newCartData);
   console.log(cartItemId, quantity);
 }
-
