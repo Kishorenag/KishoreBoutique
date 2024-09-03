@@ -147,3 +147,8 @@ export function removeFromCart(cartItemId, quantity) {
   console.table(newCartData);
   console.log(cartItemId, quantity);
 }
+
+export function removeAllDataFromLocal(){
+  localStorage.clear("cartData");
+  window.dispatchEvent(new Event("cartUpdated"));
+}

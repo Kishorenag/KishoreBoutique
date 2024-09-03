@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getCartFromLocal } from "../utils/util";
+import { getCartFromLocal, removeAllDataFromLocal } from "../utils/util";
 import {
   Button,
   Col,
@@ -15,6 +15,8 @@ import ThankYouPage from "./ThankYouPage";
 
 export default function BillingPage(props) {
   const [cartData, setCartData] = useState(getCartFromLocal());
+  // console.log("cartData", cartData);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,7 +33,7 @@ export default function BillingPage(props) {
   });
   const [errors, setErrors] = useState({});
   const [paymentMethod, setPaymentMethod] = useState("");
-const navigate = useNavigate()
+  const navigate = useNavigate();
   // const navigateToThankYouPage = () =>{
   //   navigate("/thankyou")
   // }
@@ -78,7 +80,7 @@ const navigate = useNavigate()
       setErrors(formErrors);
     } else {
       if (paymentMethod === "card" || paymentMethod === "cashOnDelivery") {
-        localStorage.removeItem("cartData");
+        removeAllDataFromLocal()
         setCartData([]);
         navigate("/thankyou", {
           state: { billingDetails: formData },
@@ -113,33 +115,28 @@ const navigate = useNavigate()
             <Form onSubmit={handleSubmit}>
               <h5>Billing Details</h5>
 
-                <Form.Group
-                  controlId="firstName"
-                  className="text-start mb-3"
-                >
-                  <Form.Label>First Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Your Firstname"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    isInvalid={!!errors.firstName}
-                  />
-                </Form.Group>
+              <Form.Group controlId="firstName" className="text-start mb-3">
+                <Form.Label>First Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter Your Firstname"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  // (e)=>{setFormData({...formData, e.target.value})}
+                  isInvalid={!!errors.firstName}
+                />
+              </Form.Group>
 
-                <Form.Group
-                  controlId="lastName"
-                  className="text-start mb-3"
-                >
-                  <Form.Label>Last Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Your Lastname"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    isInvalid={!!errors.lastName}
-                  />
-                </Form.Group>
+              <Form.Group controlId="lastName" className="text-start mb-3">
+                <Form.Label>Last Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter Your Lastname"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  isInvalid={!!errors.lastName}
+                />
+              </Form.Group>
 
               <Form.Group className="mb-3 text-start" controlId="email">
                 <Form.Label>Email</Form.Label>
@@ -213,7 +210,6 @@ const navigate = useNavigate()
                   disabled={
                     Object.keys(validateForm()).length > 0 || !paymentMethod
                   }
-                  
                 >
                   Place Your Order
                 </Button>
@@ -385,16 +381,6 @@ const navigate = useNavigate()
           </Col>
         </Row>
       </Container>
-      {/* <ThankYouPage 
-      fname = {formData.firstName}
-      lname = {formData.lastName}
-      address1 = {formData.address1}
-      address2 = {formData.address2}
-      city = {formData.city}
-      state = {formData.state}
-      number = {formData.number}
-      email = {formData.email}
-      /> */}
     </div>
   );
 }
