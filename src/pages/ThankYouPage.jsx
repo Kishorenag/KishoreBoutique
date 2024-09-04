@@ -1,12 +1,17 @@
 import React from "react";
 import { Container, Table } from "react-bootstrap";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function ThankYouPage() {
   const location = useLocation();
   const { billingDetails } = location.state || {};
+  let nav=useNavigate()
 
   let grandTotal = 0;
+
+  function navbut(){
+    nav('/')
+  }
 
   return (
     <Container className="mt-5">
@@ -53,6 +58,7 @@ export default function ThankYouPage() {
             <tr>
               <td>{billingDetails.zip}</td>
             </tr>
+            <button onClick={navbut}>Thank you</button>
           </tbody>
         </Table>
       </div>
