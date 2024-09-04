@@ -46,7 +46,7 @@ export default function LandingPage() {
               <h1>Join The Organic Movement!</h1>
               <p style={{ textAlign: "start" }}>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit
-                tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+                tellus, luctus nec ullamcorper mattis, pulvinar dapibus.
               </p>
               <Button variant="primary" size="lg" style={{ width: 200 }} onClick={()=>handleClick()}>
                 {" "}
