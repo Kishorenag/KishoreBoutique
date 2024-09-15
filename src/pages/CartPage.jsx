@@ -7,9 +7,9 @@ import {
 } from "../utils/util";
 import CartItemQuantity from "../components/CartItemQuantity";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function CartPage() {
-  const [cartData, setCartData] = useState(getCartFromLocal());
   const navigate = useNavigate();
 
   const navigateTo = (id) => {
@@ -19,30 +19,10 @@ export default function CartPage() {
     navigate("/billing");
   };
 
-  useEffect(() => {
-    async function fetchAndSaveCartData() {
-      try {
-        const updatedCartData = await saveCartToLocal();
-        setCartData(updatedCartData);
-      } catch (error) {
-        console.error("Error updating cart data:", error);
-      }
-    }
-    if (cartData?.length <= 0) {
-      fetchAndSaveCartData();
-    }
-
-    function getCartData() {
-      const updatedCartData = getCartFromLocal();
-      setCartData(updatedCartData);
-    }
-
-    window.addEventListener("cartUpdated", getCartData);
-    return () => window.removeEventListener("cartUpdated", getCartData);
-  }, [cartData]);
-
-  let grandTotal = 0;
-  let grandTotalQuantity = 0;
+  const cartItems = useSelector((state) => state.cart.items);
+  const totalQuantity = useSelector((state) => state.cart.totalQuantity);
+  const totalPrice = useSelector((state) => state.cart.totalPrice);
+  const dispatch = useDispatch();
 
   return (
     <Container className="mb-5">
@@ -66,24 +46,22 @@ export default function CartPage() {
           </thead>
 
           <tbody>
-            {Array.isArray(cartData) &&
-              cartData?.map((cartItem, index) => {
-                grandTotal += Math.round(cartItem.price) * cartItem.quantity;
-                grandTotalQuantity += cartItem.quantity;
+            {Array.isArray(cartItems) &&
+              cartItems?.map((cartItem, index) => {
                 return (
                   <tr>
                     <td>{index + 1}</td>
                     <td>
                       <Image
                         src={cartItem.image}
-                        thumbnail
                         width={100}
+                        thumbnail
                         onClick={() => navigateTo(cartItem.id)}
                         style={{ cursor: "pointer" }}
                       />
                     </td>
                     <td style={{ textAlign: "start", verticalAlign: "middle" }}>
-                      {cartItem.productName}
+                      {cartItem.title}
                     </td>
                     <td
                       style={{
@@ -100,8 +78,7 @@ export default function CartPage() {
                       }}
                     >
                       <CartItemQuantity
-                        cartItemId={cartItem.id}
-                        quantity={cartItem.quantity}
+                      product={cartItem}
                       />
                     </td>
                     <td
@@ -130,14 +107,14 @@ export default function CartPage() {
                   textAlign: "end",
                 }}
               >
-                {grandTotalQuantity}
+                {totalQuantity}
               </td>
               <td
                 style={{
                   textAlign: "end",
                 }}
               >
-                ₹{grandTotal}
+                ₹{Math.round(totalPrice)}
               </td>
             </tr>
           </tbody>
@@ -177,7 +154,7 @@ export default function CartPage() {
                     textAlign: "end",
                   }}
                 >
-                  {grandTotalQuantity}
+                  {totalQuantity}
                 </td>
               </tr>
               <tr>
@@ -194,7 +171,7 @@ export default function CartPage() {
                     textAlign: "end",
                   }}
                 >
-                  {grandTotal}
+                  {Math.round(totalPrice)}
                 </td>
               </tr>
               <tr>

@@ -3,51 +3,26 @@ import { Button, Card, Stack } from "react-bootstrap";
 import { getCartFromLocal, saveCartToLocal, toTitleCase } from "../utils/util";
 import { useNavigate } from "react-router-dom";
 import CartItemQuantity from "./CartItemQuantity";
+import { useDispatch, useSelector } from "react-redux";
+import { addItemToCart } from "../redux/CartSlice";
 
-export default function ProductCard(props) {
-  let { id, imageUrl, category, productName, rating, price } = props;
+export default function ProductCard({product}) {
+  // let { id, imageUrl, category, productName, rating, price } = props;
   const navigate = useNavigate();
 
   const navigateTo = (id) => {
     navigate(`/products/${id}`);
   };
 
-  const [cartData, setCartData] = useState(getCartFromLocal());
+  const cartItems = useSelector((state) => state.cart.items);
+  const quantity = cartItems?.filter(item => item.id == product.id)[0]?.quantity | 0
 
-  useEffect(() => {
-    function getCartData() {
-      const updatedCartData = getCartFromLocal();
-      setCartData(updatedCartData);
-    }
+  const dispatch = useDispatch();
 
-    window.addEventListener("cartUpdated", getCartData);
-    return () => window.removeEventListener("cartUpdated", getCartData);
-  }, []);
 
-  const quantity = cartData?.filter((item) => item.id === id)[0]?.quantity || 0;
-
-  function addToCart() {
-    let existingItem = cartData.find((item) => item.id === id);
-
-    let newCartData;
-
-    if (existingItem) {
-      newCartData = cartData.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      );
-    } else {
-      const newCartItemData = {
-        id: id,
-        image: imageUrl,
-        productName: productName,
-        price: price,
-        quantity: 1,
-      };
-      newCartData = [...cartData, newCartItemData];
-    }
-    saveCartToLocal(newCartData);
-    window.dispatchEvent(new Event("cartUpdated"));
-  }
+  const handleAddItem = (item) => {
+    dispatch(addItemToCart(item));
+  };
 
   return (
     <Card
@@ -59,13 +34,13 @@ export default function ProductCard(props) {
     >
       <Card.Img
         variant="top"
-        src={imageUrl}
+        src={product.image}
         style={{
           height: 300,
           objectFit: "contain",
           cursor: "pointer",
         }}
-        onClick={() => navigateTo(id)}
+        onClick={() => navigateTo(product.id)}
       />
       <Card.Body>
         <Stack
@@ -76,23 +51,25 @@ export default function ProductCard(props) {
           }}
         >
           <div>
-            <Card.Text>{toTitleCase(category)}</Card.Text>
+            <Card.Text>{toTitleCase(product.category)}</Card.Text>
             <Card.Title
-              onClick={() => navigateTo(id)}
+              onClick={() => navigateTo(product.id)}
               style={{ cursor: "pointer" }}
             >
-              {productName}
+              {product.title}
             </Card.Title>
           </div>
           <div>
-            <Card.Text>{rating}</Card.Text>
-            <Card.Text>₹ {Math.round(price)}</Card.Text>
-            {quantity <= 0 ? (
-              <Button variant="primary" onClick={addToCart}>
+            <Card.Text>{product.rating.rate}</Card.Text>
+            <Card.Text>₹ {Math.round(product.price)}</Card.Text>
+            { quantity <= 0 ? (
+              <Button variant="primary" onClick={()=>handleAddItem(product)}>
                 Add to Cart
               </Button>
             ) : (
-              <CartItemQuantity cartItemId={id} quantity={quantity} />
+              <CartItemQuantity
+              product={product}
+               />
             )}
           </div>
         </Stack>
@@ -100,20 +77,3 @@ export default function ProductCard(props) {
     </Card>
   );
 }
-
-// artObjet = [
-//   {
-//     id: 1,
-//     image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-//     productName: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-//     price: 109.95,
-//     quantity: 19,
-//   },
-// ];
-
-// apiObjet = {
-//   id: 1,
-//   title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-//   price: 109.95,
-//   image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-// };

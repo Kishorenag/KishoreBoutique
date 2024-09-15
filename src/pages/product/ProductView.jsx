@@ -7,57 +7,29 @@ import {
   toTitleCase,
 } from "../../utils/util";
 import CartItemQuantity from "../../components/CartItemQuantity";
+import { API_URL } from "../../App";
+import { useDispatch, useSelector } from "react-redux";
+import { addItemToCart } from "../../redux/CartSlice";
 
 export default function ProductView() {
   const [product, setProduct] = useState({});
-  const [cartData, setCartData] = useState(getCartFromLocal());
+  const cartItems = useSelector((state) => state.cart.items);
   const { id } = useParams();
+  const productId = parseInt(id);
+  const quantity = cartItems?.filter(item => item.id == productId)[0]?.quantity | 0
 
   useEffect(() => {
-    fetch(`https://fakestoreapi.com/products/${id}`)
+    fetch(API_URL + `/products/${id}`)
       .then((res) => res.json())
       .then((data) => setProduct(data));
   }, [id]);
 
-  useEffect(() => {
-    function getCartData() {
-      const updatedCartData = getCartFromLocal();
-      setCartData(updatedCartData);
-    }
+  const dispatch = useDispatch();
 
-    window.addEventListener("cartUpdated", getCartData);
-    return () => window.removeEventListener("cartUpdated", getCartData);
-  }, []);
 
-  const productId = parseInt(id);
-
-  const quantity =
-    cartData.find((item) => item.id === productId)?.quantity || 0;
-
-  function addToCart() {
-    let existingItem = cartData.find((item) => item.id === productId);
-
-    let newCartData;
-
-    if (existingItem) {
-      newCartData = cartData.map((item) =>
-        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
-      );
-    } else {
-      const newCartItemData = {
-        id: productId,
-        image: product.image,
-        productName: product.title,
-        price: product.price,
-        quantity: 1,
-      };
-      newCartData = [...cartData, newCartItemData];
-    }
-
-    saveCartToLocal(newCartData);
-
-    window.dispatchEvent(new Event("cartUpdated"));
-  }
+  const handleAddItem = (item) => {
+    dispatch(addItemToCart(item));
+  };
 
   return (
     <>
@@ -87,9 +59,9 @@ export default function ProductView() {
                 <span>+ Free Shipping</span>
               </div>
               {quantity > 0 ? (
-                <CartItemQuantity cartItemId={id} quantity={quantity} />
+                <CartItemQuantity product={product} />
               ) : (
-                <Button variant="primary" onClick={addToCart}>
+                <Button variant="primary" onClick={()=>handleAddItem(product)}>
                   Add to Cart
                 </Button>
               )}
