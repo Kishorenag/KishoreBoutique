@@ -1,16 +1,19 @@
 import React from "react";
 import { Container, Table } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
+import { clearCart } from "../redux/CartSlice";
+import { useDispatch } from "react-redux";
 
 export default function ThankYouPage() {
   const location = useLocation();
   const { billingDetails } = location.state || {};
-  let nav=useNavigate()
+  let nav = useNavigate();
 
   let grandTotal = 0;
-
-  function navbut(){
-    nav('/')
+  const dispatch = useDispatch();
+  function navbut() {
+    dispatch(clearCart());
+    nav("/");
   }
 
   return (
@@ -34,29 +37,29 @@ export default function ThankYouPage() {
             </tr>
             <tr>
               <td>
-                {billingDetails.firstName} {billingDetails.lastName}
+                {billingDetails?.firstName} {billingDetails?.lastName}
               </td>
             </tr>
 
             <tr>
-              <td>{billingDetails.email}</td>
+              <td>{billingDetails?.email}</td>
             </tr>
             <tr>
-              <td>{billingDetails.address1}</td>
+              <td>{billingDetails?.address1}</td>
             </tr>
-            {billingDetails.address2 && (
+            {billingDetails?.address2 && (
               <tr>
-                <td>{billingDetails.address2}</td>
+                <td>{billingDetails?.address2}</td>
               </tr>
             )}
             <tr>
-              <td>{billingDetails.city}</td>
+              <td>{billingDetails?.city}</td>
             </tr>
             <tr>
-              <td>{billingDetails.state}</td>
+              <td>{billingDetails?.state}</td>
             </tr>
             <tr>
-              <td>{billingDetails.zip}</td>
+              <td>{billingDetails?.zip}</td>
             </tr>
             <button onClick={navbut}>Thank you</button>
           </tbody>

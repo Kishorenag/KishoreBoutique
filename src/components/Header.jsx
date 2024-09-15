@@ -8,6 +8,7 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { useNavigate } from "react-router-dom";
 import { getCartFromLocal, setTotalCartBadge } from "../utils/util";
+import { useSelector } from "react-redux";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -16,16 +17,7 @@ export default function Header() {
     navigate(url);
   };
 
-  const [totalQuantity, setTotalQuantity] = useState(setTotalCartBadge());
-
-  useEffect(() => {
-    const handleStorage = () => {
-      setTotalQuantity(setTotalCartBadge());
-    };
-
-    window.addEventListener("cartUpdated", handleStorage);
-    return () => window.removeEventListener("cartUpdated", handleStorage);
-  }, []);
+  const totalQuantity = useSelector((state) => state.cart.totalQuantity);
 
   return (
     <Navbar expand="lg" className="bg-body-tertiary mt-2 mb-2">
@@ -35,34 +27,15 @@ export default function Header() {
           style={{ justifyContent: "space-around", width: "100%" }}
         >
           <Stack direction="horizontal">
-            <Navbar.Brand href="/">Kishore Boutique</Navbar.Brand>
+            <Navbar.Brand
+              onClick={() => navigateTo("/")}
+              style={{ cursor: "pointer" }}
+            >
+              Kishore Boutique
+            </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="me-auto">
-                {/* <Nav.Link onClick={() => navigateTo("/")}>
-                  Landing Page
-                </Nav.Link>
-                <Nav.Link onClick={() => navigateTo("/products")}>
-                  Products
-                </Nav.Link>
-                <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                  <NavDropdown.Item onClick={() => navigateTo("/cart")}>
-                    Cart Page
-                  </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigateTo("/billing")}>
-                    Billing Page
-                  </NavDropdown.Item>
-                  <NavDropdown.Item onClick={() => navigateTo("/thankyou")}>
-                    Thank You Page
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item
-                    onClick={() => navigateTo("/thisisanerror")}
-                  >
-                    Error Page
-                  </NavDropdown.Item>
-                </NavDropdown> */}
-              </Nav>
+              <Nav className="me-auto"></Nav>
             </Navbar.Collapse>
           </Stack>
           <Stack
@@ -70,7 +43,8 @@ export default function Header() {
             className="ms-auto"
             style={{ justifyContent: "end" }}
           >
-            <Button onClick={() => navigateTo("/cart")}
+            <Button
+              onClick={() => navigateTo("/cart")}
               style={{
                 position: "relative",
               }}
