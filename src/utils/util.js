@@ -1,3 +1,5 @@
+import { API_URL } from "../App";
+
 export function toTitleCase(str) {
   if (str === null || str === "" || str === undefined) return false;
   else str = str.toString();
@@ -99,7 +101,7 @@ export function setTotalCartBadge() {
 
 async function getProductById(id) {
   try {
-    const response = await fetch(`https://fakestoreapi.com/products/${id}`);
+    const response = await fetch(API_URL + `/products/${id}`);
     const data = await response.json();
     return data;
   } catch (error) {

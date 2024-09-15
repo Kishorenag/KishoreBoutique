@@ -1,42 +1,30 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 import { getCartFromLocal, saveCartToLocal } from "../utils/util";
+import { addItemToCart, removeItemFromCart } from "../redux/CartSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-export default function CartItemQuantity({ cartItemId, quantity }) {
-  const productId = parseInt(cartItemId);
+export default function CartItemQuantity({ product }) {
+  const cartItems = useSelector((state) => state.cart.items);
+  const quantity = cartItems?.filter(item => item?.id == product?.id)[0]?.quantity
 
-  function updateCart(newQuantity) {
-    let cartData = getCartFromLocal();
+  const dispatch = useDispatch();
 
-    if (newQuantity > 0) {
-      cartData = cartData.map((item) =>
-        item.id === productId ? { ...item, quantity: newQuantity } : item
-      );
-    } else {
-      cartData = cartData.filter((item) => item.id !== productId);
-    }
 
-    saveCartToLocal(cartData);
-    window.dispatchEvent(new Event("cartUpdated"));
-  }
-
-  const handleIncrement = () => {
-    updateCart(quantity + 1);
+  const handleAddItem = (item) => {
+    dispatch(addItemToCart(item));
   };
 
-  const handleDecrement = () => {
-    if (quantity === 1) {
-      updateCart(0);
-    } else {
-      updateCart(quantity - 1);
-    }
+  const handleRemoveItem = (id) => {
+    dispatch(removeItemFromCart(id));
   };
+
 
   return (
     <div className="cart-item-quantity">
-      <Button onClick={handleDecrement}>-</Button>
+      <Button onClick={()=>handleRemoveItem(product.id)}>-</Button>
       <span> {quantity} </span>
-      <Button onClick={handleIncrement}>+</Button>
+      <Button onClick={()=>handleAddItem(product)}>+</Button>
     </div>
   );
 }

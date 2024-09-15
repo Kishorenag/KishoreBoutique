@@ -3,12 +3,13 @@ import Image from "react-bootstrap/esm/Image";
 import Stack from "react-bootstrap/esm/Stack";
 import { Col, Row } from "react-bootstrap";
 import ProductCard from "../../components/ProductCard";
+import { API_URL } from "../../App";
 
 export default function Products(props) {
   const [allProducts, setAllProducts] = useState([]);
 
   useEffect(() => {
-    fetch("https://fakestoreapi.com/products")
+    fetch(API_URL + "/products")
       .then((res) => {
         return res.json();
       })
@@ -48,12 +49,7 @@ export default function Products(props) {
               }}
             >
               <ProductCard
-                id={product.id}
-                imageUrl={product.image}
-                category={product.category}
-                productName={product.title}
-                rating={product.rating.rate}
-                price={product.price}
+                product={product}
               />
             </Col>
           );

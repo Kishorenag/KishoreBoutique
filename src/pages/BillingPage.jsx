@@ -12,10 +12,14 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import ThankYouPage from "./ThankYouPage";
+import { useSelector } from "react-redux";
 
 export default function BillingPage(props) {
   const [cartData, setCartData] = useState(getCartFromLocal());
   // console.log("cartData", cartData);
+  const cartItems = useSelector((state) => state.cart.items);
+  const totalQuantity = useSelector((state) => state.cart.totalQuantity);
+  const totalPrice = useSelector((state) => state.cart.totalPrice);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -228,8 +232,8 @@ export default function BillingPage(props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {Array.isArray(cartData) &&
-                    cartData?.map((cartItem, index) => {
+                  {Array.isArray(cartItems) &&
+                    cartItems?.map((cartItem, index) => {
                       grandTotal +=
                         Math.round(cartItem.price) * cartItem.quantity;
                       grandTotalQuantity += cartItem.quantity;
@@ -241,7 +245,7 @@ export default function BillingPage(props) {
                               verticalAlign: "middle",
                             }}
                           >
-                            {cartItem.productName} x {cartItem.quantity}
+                            {cartItem.title} x {cartItem.quantity}
                           </td>
                           <td
                             style={{
@@ -263,7 +267,12 @@ export default function BillingPage(props) {
                     >
                       TotalQuantity
                     </th>
-                    <td>{grandTotalQuantity}</td>
+                    <td
+                    
+                    style={{
+                      textAlign: "end",
+                      verticalAlign: "middle",
+                    }}>{totalQuantity}</td>
                   </tr>
                   <tr>
                     <th
@@ -274,7 +283,12 @@ export default function BillingPage(props) {
                     >
                       Grand Total
                     </th>
-                    <td>₹{grandTotal}</td>
+                    <td
+                    
+                    style={{
+                      textAlign: "end",
+                      verticalAlign: "middle",
+                    }}>₹{Math.round(totalPrice)}</td>
                   </tr>
 
                   <tr>
